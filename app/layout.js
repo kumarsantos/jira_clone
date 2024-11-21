@@ -1,4 +1,3 @@
-/** @format */
 import Header from "@/components/Header";
 import "./globals.css";
 import { ThemeProvider } from "@/components/ui/theme-provider";

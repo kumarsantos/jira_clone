@@ -1,9 +1,11 @@
 /** @format */
 
 import Carousel from "@/components/Carousel";
+import Faq from "@/components/Faq";
 import FeatureCard from "@/components/FeatureCard";
+import StartForFree from "@/components/StartForFree";
 import { Button } from "@/components/ui/button";
-import { features } from "@/constants";
+import { faqs, features } from "@/constants";
 import { ChevronRight } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
@@ -52,12 +54,32 @@ export default function Home() {
         </div>
       </section>
       {/* Carousel section */}
-      <section id="features" className="py-20 px-5">
+      <section className="py-20 px-5">
         <div className="container mx-auto">
           <h3 className="text-3xl font-bold mb-12 text-center">
             Trusted by Industry Leaders
           </h3>
           <Carousel />
+        </div>
+      </section>
+      {/* Faq section */}
+      <section className="bg-gray-900 py-20 px-5">
+        <div className="container mx-auto">
+          <h3 className="text-3xl font-bold mb-12 text-center">
+            Frequently Asked Questions{" "}
+          </h3>
+          {faqs.map((item, index) => (
+            <Faq key={item.title} {...item} index={index} />
+          ))}
+        </div>
+      </section>
+      {/* Faq section */}
+      <section className="py-20 px-5">
+        <div className="container mx-auto">
+          <h3 className="text-3xl font-bold mb-12 text-center">
+            Ready to Transform Your Workflow?
+          </h3>
+          <StartForFree />
         </div>
       </section>
     </div>
