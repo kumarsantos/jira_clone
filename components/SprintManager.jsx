@@ -43,6 +43,7 @@ const SprintManager = ({ sprint, setSprint, sprints, projectId }) => {
         status: updatedStatus?.sprint?.status,
       });
     }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [updatedStatus]);
 
   const handleStatusChange = async (newStatus) => {

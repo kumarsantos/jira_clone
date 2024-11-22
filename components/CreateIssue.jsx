@@ -1,7 +1,7 @@
 /** @format */
 
 "use client";
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import {
   Drawer,
   DrawerClose,
@@ -26,7 +26,7 @@ import { Controller, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { issueSchema } from "@/lib/validators";
 import useFetch from "@/hooks/useFetch";
-import { createIssue } from "@/app/actions/issues";
+import { createIssue,} from "@/app/actions/issues";
 import { getOrganizationUsers } from "@/app/actions/organization";
 import { BarLoader } from "react-spinners";
 import { Input } from "./ui/input";
@@ -63,14 +63,13 @@ const CreateIssue = ({
     data: createdIssue,
   } = useFetch(createIssue);
 
-
   useEffect(() => {
     if (createdIssue) {
       reset();
       onClose();
       onIssueCreated();
     }
-  }, [createIssueLoading, createdIssue]);
+  }, [createdIssue, onClose, onIssueCreated, reset]);
 
   const {
     loading: usersLoading,
@@ -82,6 +81,7 @@ const CreateIssue = ({
     if (isOpen && orgId) {
       fetchUserFn(orgId);
     }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isOpen, orgId]);
 
   const onSubmit = async (data) => {
@@ -92,7 +92,6 @@ const CreateIssue = ({
     });
   };
 
-  console.log({ users });
 
   return (
     <Drawer open={isOpen} onClose={onClose}>
@@ -112,7 +111,9 @@ const CreateIssue = ({
               placeholder="Enter title"
             />
             {errors?.title && (
-              <p className="text-red-500 text-sm mt-1">{error?.title?.message}</p>
+              <p className="text-red-500 text-sm mt-1">
+                {error?.title?.message}
+              </p>
             )}
           </div>
           <div>

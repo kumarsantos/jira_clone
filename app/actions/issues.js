@@ -20,7 +20,6 @@ export async function getIssuesForSprint(sprintId) {
       reporter: true,
     },
   });
-
   return issues;
 }
 

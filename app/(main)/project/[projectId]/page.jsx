@@ -14,6 +14,8 @@ const Project = async ({ params }) => {
     notFound();
   }
 
+
+
   return (
     <div className="container mx-auto">
       {/* Spring creation */}
