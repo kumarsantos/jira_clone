@@ -149,7 +149,7 @@ const SprintCreationForm = ({
                             onSelect={(range) => {
                               if (range?.from && range?.to) {
                                 setDateRange(range);
-                                field?.onChange(range);
+                                field?.field?.onChange(range);
                               }
                             }}
                           />

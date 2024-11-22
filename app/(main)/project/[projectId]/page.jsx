@@ -1,6 +1,7 @@
 /** @format */
 
 import { getProject } from "@/app/actions/projects";
+import SprintBoard from "@/components/SprintBoard";
 import SprintCreationForm from "@/components/SprintCreationForm";
 import { notFound } from "next/navigation";
 import React from "react";
@@ -8,7 +9,6 @@ import React from "react";
 const Project = async ({ params }) => {
   const projectId = (await params)?.projectId;
   const projectDetails = await getProject(projectId);
-  console.log(projectDetails);
 
   if (!projectDetails) {
     notFound();
@@ -25,7 +25,11 @@ const Project = async ({ params }) => {
       />
       {/* Spring board */}
       {projectDetails?.sprints?.length > 0 ? (
-        <>list</>
+        <SprintBoard
+          sprints={projectDetails?.sprints}
+          projectId={projectId}
+          orgId={projectDetails?.organizationId}
+        />
       ) : (
         <div>Create a Sprint from button above</div>
       )}
