@@ -1,7 +1,7 @@
 /** @format */
 
 "use client";
-import React, { useEffect, useState } from "react";
+import React, { useEffect } from "react";
 
 import {
   Select,
@@ -38,7 +38,6 @@ const CreateIssue = () => {
   const issueId = searchParams.get("issueId");
   let status = searchParams.get("status");
   status = status ? status : "TODO";
-  const [issue, setIssue] = useState(null);
 
   const {
     control,
@@ -66,7 +65,6 @@ const CreateIssue = () => {
         description: result.description,
         assigneeId: result.assigneeId,
       });
-      setIssue(result);
     } catch (error) {
       console.log(error);
     }
@@ -108,7 +106,7 @@ const CreateIssue = () => {
   }, [orgId]);
 
   const onSubmit = async (data) => {
-    if (sprintId) {
+    if (issueId) {
       await updateIssueDetails(data);
     } else {
       await createIssueFn(projectId, {

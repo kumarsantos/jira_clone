@@ -1,20 +1,18 @@
 /** @format */
 "use client";
 
-import React, { startTransition, useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import SprintManager from "./SprintManager";
 import { DragDropContext, Draggable, Droppable } from "@hello-pangea/dnd";
 import { boardHeading } from "@/constants";
-import { Button } from "./ui/button";
-import { Plus } from "lucide-react";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+
 import useFetch from "@/hooks/useFetch";
 import { getIssuesForSprint, updateIssueOrder } from "@/app/actions/issues";
 import { BarLoader } from "react-spinners";
 import IssueCard from "./IssueCard";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
-import { getOrganizationUsers } from "@/app/actions/organization";
+import BoardFilters from "./BoardFilters";
 
 const reOrderList = (list, startIndex, endIndex) => {
   const result = Array.from(list);
@@ -27,8 +25,6 @@ const SprintBoard = ({ sprints, projectId, orgId, getProjectDetails }) => {
   const activeSprint = sprints?.filter((spr) => spr?.status === "ACTIVE");
   const [currentSprint, setCurrentSprint] = useState(activeSprint?.[0] || {});
   const router = useRouter();
-  const [users, setUsers] = useState([]);
-  const [selectedUser, setSelectedUser] = useState(null);
   const [issues, setIssues] = useState([]);
   const [filteredIssues, setFilteredIssues] = useState(issues);
 
@@ -46,10 +42,6 @@ const SprintBoard = ({ sprints, projectId, orgId, getProjectDetails }) => {
       console.log(error);
     }
   };
-
-  useEffect(() => {
-    setFilteredIssues(issues);
-  }, [issues?.length]);
 
   useEffect(() => {
     getIssues();
@@ -82,15 +74,6 @@ const SprintBoard = ({ sprints, projectId, orgId, getProjectDetails }) => {
       (list) => list.status === destination?.droppableId
     );
 
-    // console.log({
-    //   source,
-    //   destination,
-    //   sourceList,
-    //   destinationList,
-    //   newOrderedData,
-    // });
-
-    // return;
     if (source?.droppableId === destination?.droppableId) {
       const reorderCards = reOrderList(
         sourceList,
@@ -113,12 +96,8 @@ const SprintBoard = ({ sprints, projectId, orgId, getProjectDetails }) => {
       });
     }
 
-    // console.log({ sourceList, destinationList });
-    // return;
-
     const sortedIssues = newOrderedData.sort((a, b) => a.order - b.order);
     setIssues(newOrderedData, sortedIssues);
-
     // api call to update the order of the issue
     updateIssueOrderFn(sortedIssues);
   };
@@ -129,41 +108,14 @@ const SprintBoard = ({ sprints, projectId, orgId, getProjectDetails }) => {
     );
   };
 
-  useEffect(() => {
-    const getUser = async () => {
-      try {
-        const response = await getOrganizationUsers(orgId);
-        setUsers(response);
-      } catch (error) {
-        console.log(error);
-      }
-    };
-    orgId && getUser();
-  }, [orgId]);
-
-  const handleClickUserIcon = (user) => {
-    setSelectedUser(user);
-
-    // const filterIssues = issues?.filter((issue) => {
-    //   return issue?.assigneeId === user?.id;
-    // });
-    // if (issues?.length === filterIssues?.length) {
-    //   issues.forEach((item, i) => (item.order = i));
-    //   setFilteredIssues(issues);
-    // } else {
-    //   filterIssues.forEach((item, id) => (item.order = id));
-    //   setFilteredIssues(filterIssues);
-    // }
+  const handleFilter = (newFilteredIssues) => {
+    setFilteredIssues(newFilteredIssues);
   };
 
   const handleSprint = async (value) => {
     setCurrentSprint(value);
     await getProjectDetails(value.id);
   };
-
-  // if (issuesError) {
-  //   return <div>Error loading issues</div>;
-  // }
 
   return (
     <div>
@@ -175,33 +127,15 @@ const SprintBoard = ({ sprints, projectId, orgId, getProjectDetails }) => {
         projectId={projectId}
         activeSprint={activeSprint}
       />
-      {currentSprint.status !== "COMPLETED" && (
-        <div className="w-full my-8 flex items-center gap-x-12">
-          <Button onClick={handleAddIssue}>
-            <Plus className="mr-2 h-4 w-4" /> Create Issue
-          </Button>
-          <div className="flex items-center">
-            {users?.map((user, index) => (
-              <div
-                key={user?.imageUrl}
-                alt={user?.name}
-                className={`hover:scale-105 border p-[1px] border-transparent transition-all duration-100 rounded-full cursor-pointer ${index >= 0 ? "ml-[-16px]" : "ml-[0px]"} ${user?.id === selectedUser?.id && "border-white "}`}
-              >
-                <Avatar onClick={() => handleClickUserIcon(user)}>
-                  <AvatarImage src={user?.imageUrl} />
-                  <AvatarFallback className="capitalize">
-                    {user?.name?.[0]}
-                  </AvatarFallback>
-                </Avatar>
-              </div>
-            ))}
-          </div>
-        </div>
-      )}
 
-      {/* {issues && !issuesLoading && (
-        <BoardFilters issues={issues} onFilterChange={handleFilterChange} />
-      )} */}
+      {issues?.length && (
+        <BoardFilters
+          issues={issues}
+          onFilterChange={handleFilter}
+          handleAddIssue={handleAddIssue}
+          currentSprint={currentSprint}
+        />
+      )}
 
       {updateIssuesError && (
         <p className="text-red-500 mt-2">{updateIssuesError?.message}</p>
@@ -224,7 +158,7 @@ const SprintBoard = ({ sprints, projectId, orgId, getProjectDetails }) => {
                       {col.name}
                     </h3>
                     {/* Issues */}
-                    {issues
+                    {filteredIssues
                       ?.filter((issue) => issue.status === col.key)
                       .map((ISSUE, idx) => {
                         return (
