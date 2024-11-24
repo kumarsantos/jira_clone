@@ -24,9 +24,9 @@ const SprintCreationForm = ({
   projectId,
   projectKey,
   sprintKey,
+  getProjectDetails,
 }) => {
   const [isShowForm, setIsShowForm] = useState(false);
-  const router = useRouter();
   const path = usePathname();
 
   const [dateRange, setDateRange] = useState({
@@ -63,7 +63,7 @@ const SprintCreationForm = ({
     );
     setIsShowForm(false);
     toast.success("Sprint created successfully");
-    router.push(path); // Refresh the page to show updated data
+    await getProjectDetails();
   };
 
   return (

@@ -23,21 +23,14 @@ const reOrderList = (list, startIndex, endIndex) => {
   return result;
 };
 
-const SprintBoard = ({ sprints, projectId, orgId }) => {
-  const [currentSprint, setCurrentSprint] = useState(
-    sprints?.find((spr) => spr?.status === "ACTIVE") || sprints?.[0]
-  );
+const SprintBoard = ({ sprints, projectId, orgId, getProjectDetails }) => {
+  const activeSprint = sprints?.filter((spr) => spr?.status === "ACTIVE");
+  const [currentSprint, setCurrentSprint] = useState(activeSprint?.[0] || {});
   const router = useRouter();
   const [users, setUsers] = useState([]);
   const [selectedUser, setSelectedUser] = useState(null);
-
-  const {
-    loading: issuesLoading,
-    error: issuesError,
-    fn: fetchIssues,
-    data: issues,
-    setData: setIssues,
-  } = useFetch(getIssuesForSprint);
+  const [issues, setIssues] = useState([]);
+  const [filteredIssues, setFilteredIssues] = useState(issues);
 
   const {
     fn: updateIssueOrderFn,
@@ -45,19 +38,21 @@ const SprintBoard = ({ sprints, projectId, orgId }) => {
     error: updateIssuesError,
   } = useFetch(updateIssueOrder);
 
-  const [filteredIssues, setFilteredIssues] = useState(issues);
+  const getIssues = async () => {
+    try {
+      const response = await getIssuesForSprint(currentSprint.id);
+      setIssues(response);
+    } catch (error) {
+      console.log(error);
+    }
+  };
 
   useEffect(() => {
-    if (issues?.length > 0) {
-      setFilteredIssues(issues);
-    }
+    setFilteredIssues(issues);
   }, [issues?.length]);
 
   useEffect(() => {
-    if (currentSprint.id) {
-      fetchIssues(currentSprint.id);
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+    getIssues();
   }, [currentSprint.id]);
 
   const onDragEnd = async (result) => {
@@ -81,13 +76,22 @@ const SprintBoard = ({ sprints, projectId, orgId }) => {
 
     const newOrderedData = [...issues];
     const sourceList = newOrderedData?.filter(
-      (list) => list.status === source.droppableId
+      (list) => list.status === source?.droppableId
     );
     const destinationList = newOrderedData?.filter(
-      (list) => list.status === destination.droppableId
+      (list) => list.status === destination?.droppableId
     );
 
-    if (source.droppableId === destination.droppableId) {
+    // console.log({
+    //   source,
+    //   destination,
+    //   sourceList,
+    //   destinationList,
+    //   newOrderedData,
+    // });
+
+    // return;
+    if (source?.droppableId === destination?.droppableId) {
       const reorderCards = reOrderList(
         sourceList,
         source.index,
@@ -97,17 +101,21 @@ const SprintBoard = ({ sprints, projectId, orgId }) => {
         item.order = idx;
       });
     } else {
-      const [movedCard] = sourceList.splice(source.index, 1);
-      movedCard.status = destination.droppableId;
-      destinationList.splice(destination.index, 0, movedCard);
+      const [movedCard] = sourceList?.splice(source.index, 1);
+      movedCard.status = destination?.droppableId;
+      destinationList.splice(destination?.index, 0, movedCard);
 
-      sourceList.forEach((item, idx) => {
+      sourceList?.forEach((item, idx) => {
         item.order = idx;
       });
-      destinationList.forEach((item, idx) => {
+      destinationList?.forEach((item, idx) => {
         item.order = idx;
       });
     }
+
+    // console.log({ sourceList, destinationList });
+    // return;
+
     const sortedIssues = newOrderedData.sort((a, b) => a.order - b.order);
     setIssues(newOrderedData, sortedIssues);
 
@@ -117,7 +125,7 @@ const SprintBoard = ({ sprints, projectId, orgId }) => {
 
   const handleAddIssue = () => {
     router.push(
-      `/project/sprint/create?projectId=${projectId}&orgId=${orgId}&sprintId=${currentSprint?.id}`
+      `/project/issue/create?projectId=${projectId}&orgId=${orgId}&sprintId=${currentSprint?.id}`
     );
   };
 
@@ -135,24 +143,37 @@ const SprintBoard = ({ sprints, projectId, orgId }) => {
 
   const handleClickUserIcon = (user) => {
     setSelectedUser(user);
-    const filterIssues = issues?.filter((issue) => {
-      return issue?.assigneeId === user?.id;
-    });
-    setFilteredIssues(filterIssues);
+
+    // const filterIssues = issues?.filter((issue) => {
+    //   return issue?.assigneeId === user?.id;
+    // });
+    // if (issues?.length === filterIssues?.length) {
+    //   issues.forEach((item, i) => (item.order = i));
+    //   setFilteredIssues(issues);
+    // } else {
+    //   filterIssues.forEach((item, id) => (item.order = id));
+    //   setFilteredIssues(filterIssues);
+    // }
   };
 
-  if (issuesError) {
-    return <div>Error loading issues</div>;
-  }
+  const handleSprint = async (value) => {
+    setCurrentSprint(value);
+    await getProjectDetails(value.id);
+  };
+
+  // if (issuesError) {
+  //   return <div>Error loading issues</div>;
+  // }
 
   return (
     <div>
       {/* Sprint Manager */}
       <SprintManager
         sprint={currentSprint}
-        setSprint={setCurrentSprint}
+        setSprint={handleSprint}
         sprints={sprints}
         projectId={projectId}
+        activeSprint={activeSprint}
       />
       {currentSprint.status !== "COMPLETED" && (
         <div className="w-full my-8 flex items-center gap-x-12">
@@ -185,7 +206,7 @@ const SprintBoard = ({ sprints, projectId, orgId }) => {
       {updateIssuesError && (
         <p className="text-red-500 mt-2">{updateIssuesError?.message}</p>
       )}
-      {(updateIssuesLoading || issuesLoading) && (
+      {updateIssuesLoading && (
         <BarLoader className="mt-4" width={"100%"} color="#36d7b7" />
       )}
       <DragDropContext onDragEnd={onDragEnd}>
@@ -203,7 +224,7 @@ const SprintBoard = ({ sprints, projectId, orgId }) => {
                       {col.name}
                     </h3>
                     {/* Issues */}
-                    {filteredIssues
+                    {issues
                       ?.filter((issue) => issue.status === col.key)
                       .map((ISSUE, idx) => {
                         return (
@@ -219,7 +240,13 @@ const SprintBoard = ({ sprints, projectId, orgId }) => {
                                   {...provided.draggableProps}
                                   {...provided.dragHandleProps}
                                 >
-                                  <IssueCard issue={ISSUE} />
+                                  <IssueCard
+                                    issue={ISSUE}
+                                    getIssues={getIssues}
+                                    projectId={projectId}
+                                    orgId={orgId}
+                                    sprintId={currentSprint?.id}
+                                  />
                                 </div>
                               );
                             }}

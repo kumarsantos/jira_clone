@@ -140,12 +140,13 @@ export async function updateIssue(issueId, data) {
     if (issue.project.organizationId !== orgId) {
       throw new Error("Unauthorized");
     }
-
     const updatedIssue = await db.issue.update({
       where: { id: issueId },
       data: {
         status: data.status,
         priority: data.priority,
+        title: data.title,
+        description: data.description,
       },
       include: {
         assignee: true,

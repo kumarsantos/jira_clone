@@ -1,39 +1,57 @@
 /** @format */
-
+"use client";
 import { getProject } from "@/app/actions/projects";
 import SprintBoard from "@/components/SprintBoard";
 import SprintCreationForm from "@/components/SprintCreationForm";
-import { notFound } from "next/navigation";
-import React from "react";
+import { useParams } from "next/navigation";
+import React, { useEffect, useState } from "react";
+import { BarLoader } from "react-spinners";
 
-const Project = async ({ params }) => {
-  const projectId = (await params)?.projectId;
-  const projectDetails = await getProject(projectId);
+const Project = () => {
+  const params = useParams();
+  const { projectId } = params;
+  const [projectDetails, setProjectDetails] = useState(null);
+  const [loading, setLoading] = useState(false);
 
-  if (!projectDetails) {
-    notFound();
-  }
+  const getProjectDetails = async () => {
+    setLoading(true);
+    try {
+      const response = await getProject(projectId);
+      setProjectDetails(response);
+    } catch (error) {
+      console.log(error);
+    } finally {
+      setLoading(false);
+    }
+  };
 
-
+  useEffect(() => {
+    getProjectDetails();
+  }, [projectId]);
 
   return (
     <div className="container mx-auto">
+      {loading && <BarLoader width="100%" />}
       {/* Spring creation */}
-      <SprintCreationForm
-        projectTitle={projectDetails?.name}
-        projectId={projectId}
-        projectKey={projectDetails?.key}
-        sprintKey={projectDetails?.sprints?.length + 1}
-      />
+      {!!Boolean(projectDetails) && (
+        <SprintCreationForm
+          projectTitle={projectDetails?.name}
+          projectId={projectId}
+          projectKey={projectDetails?.key}
+          sprintKey={projectDetails?.sprints?.length + 1}
+          getProjectDetails={getProjectDetails}
+        />
+      )}
       {/* Spring board */}
       {projectDetails?.sprints?.length > 0 ? (
         <SprintBoard
           sprints={projectDetails?.sprints}
           projectId={projectId}
           orgId={projectDetails?.organizationId}
+          getProjectDetails={getProjectDetails}
         />
       ) : (
-        <div>Create a Sprint from button above</div>
+        <p>Please create sprint by clicking on the above button</p>
       )}
     </div>
   );

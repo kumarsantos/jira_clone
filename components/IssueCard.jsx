@@ -12,6 +12,13 @@ import {
 import { Badge } from "./ui/badge";
 import UserAvatar from "./UserAvatar";
 import { formatDistanceToNow } from "date-fns";
+import { Button } from "./ui/button";
+import { LucideDelete } from "lucide-react";
+import { toast } from "sonner";
+import { deleteIssue } from "@/app/actions/issues";
+import { useUser } from "@clerk/nextjs";
+import { useRouter } from "next/navigation";
+import Link from "next/link";
 
 const priorityColor = {
   LOW: "border-green-600",
@@ -22,21 +29,43 @@ const priorityColor = {
 
 const IssueCard = ({
   issue,
+  projectId,
+  orgId,
+  sprintId,
+  getIssues = async () => {},
   showStatus = false,
-  onDelete = () => {},
-  onUpdate = () => {},
 }) => {
-
-    const [isDialogOpen,setIsDialogOpen]=useState(false);
+  const { user } = useUser();
+  const router = useRouter();
 
   const created = formatDistanceToNow(new Date(issue?.createdAt), {
     addSuffix: true,
   });
 
+  const handleDelete = async (e) => {
+    e.stopPropagation();
+    try {
+      await deleteIssue(issue.id);
+      await getIssues();
+    } catch (error) {
+      toast.error("Failed to delete the issue");
+    }
+  };
+  const handleRedirect = () => {
+    router.push(
+      `/project/issue/create/?issueId=${issue?.id}&orgId=${orgId}&projectId=${projectId}&sprintId=${sprintId}&status=${issue.status}`
+    );
+  };
+
   return (
     <>
-      <Card className="cursor-pointer hover:shadow-md transition-shadow">
-        <CardHeader className={`border-t-2 ${priorityColor[issue?.priority]} rounded-lg`}>
+      <Card
+        className="cursor-pointer hover:shadow-md transition-shadow"
+        onClick={handleRedirect}
+      >
+        <CardHeader
+          className={`border-t-2 ${priorityColor[issue?.priority]} rounded-lg`}
+        >
           <CardTitle>{issue?.title}</CardTitle>
         </CardHeader>
         <CardContent className="flex gap-2 -mt-3">
@@ -47,11 +76,23 @@ const IssueCard = ({
         </CardContent>
         <CardFooter className="flex flex-col items-start space-y-3">
           <UserAvatar user={issue?.assignee} />
-          <div className="text-xs text-gray-400 w-full">Created {created}</div>
+          <div className="text-xs text-gray-400 w-full flex justify-between">
+            <span>Created {created}</span>
+            {issue?.reporter?.clerkUserId === user?.id && (
+              <span>
+                <Button
+                  onClick={handleDelete}
+                  variant="ghost"
+                  className="text-white h-8 w-8 bg-orange-800"
+                  size="xs"
+                >
+                  <LucideDelete />
+                </Button>
+              </span>
+            )}
+          </div>
         </CardFooter>
       </Card>
-
-      {isDialogOpen && <>Model</>}
     </>
   );
 };

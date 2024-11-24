@@ -17,9 +17,15 @@ import { updateSprintStatus } from "@/app/actions/sprints";
 import { BarLoader } from "react-spinners";
 import { useRouter } from "next/navigation";
 
-const SprintManager = ({ sprint, setSprint, sprints, projectId }) => {
+const SprintManager = ({
+  sprint,
+  setSprint,
+  sprints,
+  projectId,
+  activeSprint,
+}) => {
   const [status, setStatus] = useState(sprint?.status);
- const router=useRouter();
+  const router = useRouter();
   const startDate = new Date(sprint?.startDate);
   const endDate = new Date(sprint?.endDate);
   const now = new Date();
@@ -43,7 +49,7 @@ const SprintManager = ({ sprint, setSprint, sprints, projectId }) => {
         status: updatedStatus?.sprint?.status,
       });
     }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [updatedStatus]);
 
   const handleStatusChange = async (newStatus) => {
@@ -69,7 +75,6 @@ const SprintManager = ({ sprint, setSprint, sprints, projectId }) => {
     }
     return null;
   };
-
   return (
     <>
       <div className="flex justify-between items-center gap-4">
@@ -92,7 +97,7 @@ const SprintManager = ({ sprint, setSprint, sprints, projectId }) => {
           <Button
             className="bg-green-900 text-white hover:bg-green-700"
             onClick={() => handleStatusChange("ACTIVE")}
-            disabled={loading}
+            disabled={loading || activeSprint?.length}
           >
             Start Sprint
           </Button>

@@ -1,7 +1,7 @@
 /** @format */
 
 "use client";
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 
 import {
   Select,
@@ -16,35 +16,77 @@ import { Controller, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { issueSchema } from "@/lib/validators";
 import useFetch from "@/hooks/useFetch";
-import { createIssue } from "@/app/actions/issues";
+import {
+  createIssue,
+  getIssuesForSprint,
+  updateIssue,
+} from "@/app/actions/issues";
 import { getOrganizationUsers } from "@/app/actions/organization";
 import { BarLoader } from "react-spinners";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
+import { toast } from "sonner";
 
 const CreateIssue = () => {
   const router = useRouter();
   const searchParams = useSearchParams();
 
   const orgId = searchParams.get("orgId");
-  const status = "TODO";
   const sprintId = searchParams.get("sprintId");
   const projectId = searchParams.get("projectId");
+  const issueId = searchParams.get("issueId");
+  let status = searchParams.get("status");
+  status = status ? status : "TODO";
+  const [issue, setIssue] = useState(null);
 
   const {
     control,
     register,
     handleSubmit,
+    reset,
     formState: { errors },
   } = useForm({
     resolver: zodResolver(issueSchema),
     defaultValues: {
-      priority: "MEDIUM",
+      title: "",
+      priority: "",
       description: "",
       assigneeId: "",
     },
   });
+
+  const getIssueDetails = async () => {
+    try {
+      const response = await getIssuesForSprint(sprintId);
+      const result = response?.find((item) => item.id === issueId);
+      reset({
+        title: result.title,
+        priority: result.priority ?? "MEDIUM",
+        description: result.description,
+        assigneeId: result.assigneeId,
+      });
+      setIssue(result);
+    } catch (error) {
+      console.log(error);
+    }
+  };
+  const updateIssueDetails = async (data) => {
+    try {
+      const res = await updateIssue(issueId, {
+        ...data,
+        status,
+        sprintId,
+      });
+      res && toast.success("Issue update successfully");
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  useEffect(() => {
+    issueId && getIssueDetails();
+  }, [issueId]);
 
   const {
     loading: createIssueLoading,
@@ -66,11 +108,15 @@ const CreateIssue = () => {
   }, [orgId]);
 
   const onSubmit = async (data) => {
-    await createIssueFn(projectId, {
-      ...data,
-      status,
-      sprintId,
-    });
+    if (sprintId) {
+      await updateIssueDetails(data);
+    } else {
+      await createIssueFn(projectId, {
+        ...data,
+        status,
+        sprintId,
+      });
+    }
     router.push(`/project/${projectId}`);
   };
 
@@ -179,7 +225,13 @@ const CreateIssue = () => {
         </div>
         {error && <p className="text-red-500 text-sm mt-1">{error.message}</p>}
         <Button type="submit" className="w-full" disabled={createIssueLoading}>
-          {createIssueLoading ? "Creating..." : "Create Issue"}
+          {createIssueLoading
+            ? issueId
+              ? "Updating..."
+              : "Creating..."
+            : issueId
+              ? "Update Issue"
+              : "Create Issue"}
         </Button>
       </form>
     </div>
