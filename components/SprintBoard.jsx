@@ -7,12 +7,14 @@ import { DragDropContext, Draggable, Droppable } from "@hello-pangea/dnd";
 import { boardHeading } from "@/constants";
 import { Button } from "./ui/button";
 import { Plus } from "lucide-react";
-import CreateIssueDrawer from "./CreateIssue";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import useFetch from "@/hooks/useFetch";
 import { getIssuesForSprint, updateIssueOrder } from "@/app/actions/issues";
 import { BarLoader } from "react-spinners";
 import IssueCard from "./IssueCard";
 import { toast } from "sonner";
+import { useRouter } from "next/navigation";
+import { getOrganizationUsers } from "@/app/actions/organization";
 
 const reOrderList = (list, startIndex, endIndex) => {
   const result = Array.from(list);
@@ -25,8 +27,9 @@ const SprintBoard = ({ sprints, projectId, orgId }) => {
   const [currentSprint, setCurrentSprint] = useState(
     sprints?.find((spr) => spr?.status === "ACTIVE") || sprints?.[0]
   );
-  const [isDrawerOpen, setIsDrawerOpen] = useState(false);
-  const [selectedStatus, setSelectedStatus] = useState(null);
+  const router = useRouter();
+  const [users, setUsers] = useState([]);
+  const [selectedUser, setSelectedUser] = useState(null);
 
   const {
     loading: issuesLoading,
@@ -42,13 +45,13 @@ const SprintBoard = ({ sprints, projectId, orgId }) => {
     error: updateIssuesError,
   } = useFetch(updateIssueOrder);
 
-  const handleIssueCreated = async () => {
-    // startTransition(()=>{
-    //   fetchIssues(currentSprint.id);
-    // })
-  };
-
   const [filteredIssues, setFilteredIssues] = useState(issues);
+
+  useEffect(() => {
+    if (issues?.length > 0) {
+      setFilteredIssues(issues);
+    }
+  }, [issues?.length]);
 
   useEffect(() => {
     if (currentSprint.id) {
@@ -112,14 +115,36 @@ const SprintBoard = ({ sprints, projectId, orgId }) => {
     updateIssueOrderFn(sortedIssues);
   };
 
-  const handleAddIssue = (status) => {
-    setSelectedStatus(status);
-    setIsDrawerOpen(true);
+  const handleAddIssue = () => {
+    router.push(
+      `/project/sprint/create?projectId=${projectId}&orgId=${orgId}&sprintId=${currentSprint?.id}`
+    );
+  };
+
+  useEffect(() => {
+    const getUser = async () => {
+      try {
+        const response = await getOrganizationUsers(orgId);
+        setUsers(response);
+      } catch (error) {
+        console.log(error);
+      }
+    };
+    orgId && getUser();
+  }, [orgId]);
+
+  const handleClickUserIcon = (user) => {
+    setSelectedUser(user);
+    const filterIssues = issues?.filter((issue) => {
+      return issue?.assigneeId === user?.id;
+    });
+    setFilteredIssues(filterIssues);
   };
 
   if (issuesError) {
     return <div>Error loading issues</div>;
   }
+
   return (
     <div>
       {/* Sprint Manager */}
@@ -129,6 +154,29 @@ const SprintBoard = ({ sprints, projectId, orgId }) => {
         sprints={sprints}
         projectId={projectId}
       />
+      {currentSprint.status !== "COMPLETED" && (
+        <div className="w-full my-8 flex items-center gap-x-12">
+          <Button onClick={handleAddIssue}>
+            <Plus className="mr-2 h-4 w-4" /> Create Issue
+          </Button>
+          <div className="flex items-center">
+            {users?.map((user, index) => (
+              <div
+                key={user?.imageUrl}
+                alt={user?.name}
+                className={`hover:scale-105 border p-[1px] border-transparent transition-all duration-100 rounded-full cursor-pointer ${index >= 0 ? "ml-[-16px]" : "ml-[0px]"} ${user?.id === selectedUser?.id && "border-white "}`}
+              >
+                <Avatar onClick={() => handleClickUserIcon(user)}>
+                  <AvatarImage src={user?.imageUrl} />
+                  <AvatarFallback className="capitalize">
+                    {user?.name?.[0]}
+                  </AvatarFallback>
+                </Avatar>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
 
       {/* {issues && !issuesLoading && (
         <BoardFilters issues={issues} onFilterChange={handleFilterChange} />
@@ -155,7 +203,7 @@ const SprintBoard = ({ sprints, projectId, orgId }) => {
                       {col.name}
                     </h3>
                     {/* Issues */}
-                    {issues
+                    {filteredIssues
                       ?.filter((issue) => issue.status === col.key)
                       .map((ISSUE, idx) => {
                         return (
@@ -180,16 +228,6 @@ const SprintBoard = ({ sprints, projectId, orgId }) => {
                       })}
 
                     {provided.placeholder}
-                    {col.key === "TODO" &&
-                      currentSprint.status !== "COMPLETED" && (
-                        <Button
-                          variant="ghost"
-                          className="w-full"
-                          onClick={() => handleAddIssue(col.key)}
-                        >
-                          <Plus className="mr-2 h-4 w-4" /> Create Issue
-                        </Button>
-                      )}
                   </div>
                 );
               }}
@@ -197,15 +235,6 @@ const SprintBoard = ({ sprints, projectId, orgId }) => {
           ))}
         </div>
       </DragDropContext>
-      <CreateIssueDrawer
-        isOpen={isDrawerOpen}
-        onClose={() => setIsDrawerOpen(false)}
-        sprintId={currentSprint.id}
-        status={selectedStatus}
-        projectId={projectId}
-        onIssueCreated={handleIssueCreated}
-        orgId={orgId}
-      />
     </div>
   );
 };
