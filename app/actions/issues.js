@@ -122,13 +122,13 @@ export async function deleteIssue(issueId) {
 }
 
 export async function updateIssue(issueId, data) {
-  const { userId, orgId } = await auth();
-
-  if (!userId || !orgId) {
-    throw new Error("Unauthorized");
-  }
-
   try {
+    const { userId, orgId } = await auth();
+
+    if (!userId || !orgId) {
+      throw new Error("Unauthorized");
+    }
+
     const issue = await db.issue.findUnique({
       where: { id: issueId },
       include: { project: true },
@@ -148,6 +148,7 @@ export async function updateIssue(issueId, data) {
         priority: data.priority,
         title: data.title,
         description: data.description,
+        assigneeId: data.assigneeId,
       },
       include: {
         assignee: true,
