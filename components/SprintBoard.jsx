@@ -157,7 +157,6 @@ const SprintBoard = ({ sprints, projectId, orgId, getProjectDetails }) => {
                     <h3 className="font-semibold mb-2 text-center">
                       {col.name}
                     </h3>
-                    {/* Issues */}
                     {filteredIssues
                       ?.filter((issue) => issue.status === col.key)
                       .map((ISSUE, idx) => {
