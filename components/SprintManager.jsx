@@ -86,8 +86,8 @@ const SprintManager = ({
             {sprints?.map((spr) => {
               return (
                 <SelectItem key={spr?.id} value={spr?.id}>
-                  {sprint?.name} ({format(sprint?.startDate, "MMM d, yyyy")}) to
-                  ({format(sprint?.endDate, "MMM d, yyyy")})
+                  {sprint?.name} ({format(spr?.startDate, "MMM d, yyyy")}) to
+                  ({format(spr?.endDate, "MMM d, yyyy")})
                 </SelectItem>
               );
             })}

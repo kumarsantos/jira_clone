@@ -120,13 +120,13 @@ const SprintBoard = ({ sprints, projectId, orgId, getProjectDetails }) => {
   return (
     <div>
       {/* Sprint Manager */}
-      {/* <SprintManager
+      <SprintManager
         sprint={currentSprint}
         setSprint={handleSprint}
         sprints={sprints}
         projectId={projectId}
         activeSprint={activeSprint}
-      /> */}
+      />
 
       {issues?.length && (
         <BoardFilters
