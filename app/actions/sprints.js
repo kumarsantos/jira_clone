@@ -5,9 +5,8 @@
 import { db } from "@/lib/prisma";
 import { auth } from "@clerk/nextjs/server";
 import { addDays } from "date-fns";
-import { revalidatePath } from "next/cache";
 
-export async function createSprint(projectId, data, path) {
+export async function createSprint(projectId, data) {
   const { userId, orgId } = await auth();
 
   if (!userId || !orgId) {
@@ -23,6 +22,8 @@ export async function createSprint(projectId, data, path) {
     throw new Error("Project not found");
   }
 
+  console.log({projectId,data})
+
   const sprint = await db.sprint.create({
     data: {
       name: data?.name ?? "",
@@ -32,7 +33,6 @@ export async function createSprint(projectId, data, path) {
       projectId: projectId,
     },
   });
-  revalidatePath(path);
   return sprint;
 }
 
