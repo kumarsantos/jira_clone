@@ -120,13 +120,13 @@ const SprintBoard = ({ sprints, projectId, orgId, getProjectDetails }) => {
   return (
     <div>
       {/* Sprint Manager */}
-      <SprintManager
+      {/* <SprintManager
         sprint={currentSprint}
         setSprint={handleSprint}
         sprints={sprints}
         projectId={projectId}
         activeSprint={activeSprint}
-      />
+      /> */}
 
       {issues?.length && (
         <BoardFilters
@@ -143,7 +143,7 @@ const SprintBoard = ({ sprints, projectId, orgId, getProjectDetails }) => {
       {updateIssuesLoading && (
         <BarLoader className="mt-4" width={"100%"} color="#36d7b7" />
       )}
-      {/* <DragDropContext onDragEnd={onDragEnd}>
+      <DragDropContext onDragEnd={onDragEnd}>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 mt-4 gap-4 bg-slate-950 p-4 rounded-lg">
           {boardHeading.map((col) => (
             <Droppable key={col.key} droppableId={col.key}>
@@ -194,7 +194,7 @@ const SprintBoard = ({ sprints, projectId, orgId, getProjectDetails }) => {
             </Droppable>
           ))}
         </div>
-      </DragDropContext> */}
+      </DragDropContext>
     </div>
   );
 };
