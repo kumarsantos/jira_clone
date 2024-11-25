@@ -41,7 +41,7 @@ const SprintCreationForm = ({
     resolver: zodResolver(sprintSchema),
     defaultValues: {
       name: `${projectKey}-${sprintKey}`,
-      startDate: dateRange?.fromj ?? new Date(),
+      startDate: dateRange?.from ?? new Date(),
       endDate: dateRange?.to ?? new Date(),
     },
   });
@@ -115,7 +115,7 @@ const SprintCreationForm = ({
                             className={`w-full justify-start text-left font-normal bg-slate-950 ${!dateRange && "text-muted-foreground"}`}
                           >
                             <CalendarRangeIcon className="mr-2 h-4 w-4" />
-                            {dateRange.from && dateRange.to ? (
+                            {dateRange?.from && dateRange?.to ? (
                               format(dateRange.from, "LL dd, y") +
                               " - " +
                               format(dateRange.to, "LL dd, y")
