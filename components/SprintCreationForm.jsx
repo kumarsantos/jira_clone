@@ -71,7 +71,7 @@ const SprintCreationForm = ({
           onClick={() => setIsShowForm(!isShowForm)}
           variant={isShowForm ? "destructive" : "default"}
         >
-          {isShowForm ? "Cancel" : "Create New Spring"}
+          {isShowForm ? "Cancel" : "Create New Sprint"}
         </Button>
       </div>
       {isShowForm && (
