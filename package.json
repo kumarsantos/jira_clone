@@ -9,7 +9,6 @@
     "lint": "next lint"
   },
   "overrides": {
-    "prisma": "$prisma",
     "react": "$react",
     "react-dom": "$react-dom",
     "npm": "$npm"
