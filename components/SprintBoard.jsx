@@ -23,7 +23,7 @@ const reOrderList = (list = [], startIndex, endIndex) => {
 
 const SprintBoard = ({ sprints, projectId, orgId, getProjectDetails }) => {
   const activeSprint = sprints?.filter((spr) => spr?.status === "ACTIVE");
-  const [currentSprint, setCurrentSprint] = useState(activeSprint?.[0] || {});
+  const [currentSprint, setCurrentSprint] = useState(activeSprint?.[0] || sprints?.[0]);
   const router = useRouter();
   const [issues, setIssues] = useState([]);
   const [filteredIssues, setFilteredIssues] = useState(issues);
