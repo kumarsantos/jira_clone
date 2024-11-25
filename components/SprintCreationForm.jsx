@@ -27,8 +27,6 @@ const SprintCreationForm = ({
   getProjectDetails,
 }) => {
   const [isShowForm, setIsShowForm] = useState(false);
-  const path = usePathname();
-
   const [dateRange, setDateRange] = useState({
     from: new Date(),
     to: addDays(new Date(), 14),
@@ -43,8 +41,8 @@ const SprintCreationForm = ({
     resolver: zodResolver(sprintSchema),
     defaultValues: {
       name: `${projectKey}-${sprintKey}`,
-      startDate: dateRange.from,
-      endDate: dateRange.to,
+      startDate: dateRange?.fromj ?? new Date(),
+      endDate: dateRange?.to ?? new Date(),
     },
   });
 
@@ -52,15 +50,11 @@ const SprintCreationForm = ({
     useFetch(createSprint);
 
   const onSubmit = async (data) => {
-    await createSprintFn(
-      projectId,
-      {
-        ...data,
-        startDate: dateRange.from,
-        endDate: dateRange.to,
-      },
-      path
-    );
+    await createSprintFn(projectId, {
+      ...data,
+      startDate: dateRange?.from ?? new Date(),
+      endDate: dateRange?.to ?? addDays(new Date(), 14),
+    });
     setIsShowForm(false);
     toast.success("Sprint created successfully");
     await getProjectDetails();
