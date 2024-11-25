@@ -28,6 +28,9 @@ const SprintBoard = ({ sprints, projectId, orgId, getProjectDetails }) => {
   const [issues, setIssues] = useState([]);
   const [filteredIssues, setFilteredIssues] = useState(issues);
 
+
+  console.log({currentSprint})
+
   const {
     fn: updateIssueOrderFn,
     loading: updateIssuesLoading,
