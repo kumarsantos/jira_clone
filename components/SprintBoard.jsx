@@ -104,7 +104,7 @@ const SprintBoard = ({ sprints, projectId, orgId, getProjectDetails }) => {
 
   const handleAddIssue = () => {
     router.push(
-      `/project/issue/create?projectId=${projectId}&orgId=${orgId}&sprintId=${currentSprint?.id}`
+      `/project/issue/create?projectId=${projectId}&orgId=${orgId}&sprintId=${currentSprint?.id}&isProject=true`
     );
   };
 

@@ -20,6 +20,7 @@ export async function getIssuesForSprint(sprintId) {
       reporter: true,
     },
   });
+
   return issues;
 }
 
@@ -157,5 +158,42 @@ export async function updateIssue(issueId, data) {
     return updatedIssue;
   } catch (error) {
     throw new Error("Error updating issue: " + error.message);
+  }
+}
+
+export async function getUserIssues(userId) {
+  const { orgId } = await auth();
+
+  if (!orgId) {
+    throw new Error("Unauthorized");
+  }
+
+  try {
+    const user = await db.user.findUnique({
+      where: { clerkUserId: userId },
+    });
+
+    if (!user) {
+      throw new Error("User not found");
+    }
+
+    const issues = await db.issue.findMany({
+      where: {
+        OR: [{ assigneeId: user.id }, { reporterId: user.id }],
+        project: {
+          organizationId: orgId,
+        },
+      },
+      include: {
+        project: true,
+        assignee: true,
+        reporter: true,
+      },
+      orderBy: { updatedAt: "desc" },
+    });
+
+    return issues;
+  } catch (error) {
+    throw new Error("Error fetching issues: " + error.message);
   }
 }

@@ -36,6 +36,7 @@ const CreateIssue = () => {
   const sprintId = searchParams.get("sprintId");
   const projectId = searchParams.get("projectId");
   const issueId = searchParams.get("issueId");
+  const isProject = searchParams.get("isProject");
   let status = searchParams.get("status");
   status = status ? status : "TODO";
 
@@ -115,7 +116,11 @@ const CreateIssue = () => {
         sprintId,
       });
     }
-    router.push(`/project/${projectId}`);
+    if (isProject) {
+      router.push(`/project/${projectId}`);
+    } else {
+      router.push(`/organization/${orgId}`);
+    }
   };
 
   return (

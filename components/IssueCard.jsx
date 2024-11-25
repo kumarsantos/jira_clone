@@ -1,10 +1,9 @@
 /** @format */
 "use client";
-import React, { useState } from "react";
+import React from "react";
 import {
   Card,
   CardContent,
-  CardDescription,
   CardFooter,
   CardHeader,
   CardTitle,
@@ -17,8 +16,7 @@ import { LucideDelete } from "lucide-react";
 import { toast } from "sonner";
 import { deleteIssue } from "@/app/actions/issues";
 import { useUser } from "@clerk/nextjs";
-import { useRouter } from "next/navigation";
-import Link from "next/link";
+import { usePathname, useRouter } from "next/navigation";
 
 const priorityColor = {
   LOW: "border-green-600",
@@ -37,6 +35,7 @@ const IssueCard = ({
 }) => {
   const { user } = useUser();
   const router = useRouter();
+  const path = usePathname();
 
   const created = formatDistanceToNow(new Date(issue?.createdAt), {
     addSuffix: true,
@@ -52,9 +51,15 @@ const IssueCard = ({
     }
   };
   const handleRedirect = () => {
-    router.push(
-      `/project/issue/create/?issueId=${issue?.id}&orgId=${orgId}&projectId=${projectId}&sprintId=${sprintId}&status=${issue.status}`
-    );
+    if (path?.includes("project")) {
+      router.push(
+        `/project/issue/create/?issueId=${issue?.id}&orgId=${orgId}&projectId=${projectId}&sprintId=${sprintId}&status=${issue.status}&isProject=true`
+      );
+    } else {
+      router.push(
+        `/project/issue/create/?issueId=${issue?.id}&orgId=${orgId}&projectId=${projectId}&sprintId=${sprintId}&status=${issue.status}`
+      );
+    }
   };
 
   return (

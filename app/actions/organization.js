@@ -47,7 +47,7 @@ export async function getOrganizations(slug) {
 }
 
 export async function getProjects(orgId) {
-  const { userId } =await  auth();
+  const { userId } = await auth();
   if (!userId) {
     throw new Error("Unauthorized");
   }
@@ -103,10 +103,12 @@ export async function getUserIssues(userId) {
 
 export async function getOrganizationUsers(orgId) {
   const { userId } = await auth();
+
   if (!userId) {
     throw new Error("Unauthorized");
   }
 
+  
   const user = await db.user.findUnique({
     where: { clerkUserId: userId },
   });
@@ -115,12 +117,13 @@ export async function getOrganizationUsers(orgId) {
     throw new Error("User not found");
   }
 
-  const organizationMemberships =
-    await (await clerkClient()).organizations.getOrganizationMembershipList({
-      organizationId: orgId,
-    });
+  const organizationMemberships = await (
+    await clerkClient()
+  ).organizations.getOrganizationMembershipList({
+    organizationId: orgId,
+  });
 
-  const userIds = organizationMemberships.data.map(
+  const userIds = organizationMemberships?.data?.map(
     (membership) => membership.publicUserData.userId
   );
 
