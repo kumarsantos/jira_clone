@@ -3,8 +3,8 @@
 import { getProject } from "@/app/actions/projects";
 import SprintBoard from "@/components/SprintBoard";
 import SprintCreationForm from "@/components/SprintCreationForm";
-import { useParams, useRouter } from "next/navigation";
-import React, { useCallback, useEffect, useState } from "react";
+import { useParams } from "next/navigation";
+import React, { Suspense, useCallback, useEffect, useState } from "react";
 import { BarLoader } from "react-spinners";
 
 const Project = () => {
@@ -28,31 +28,35 @@ const Project = () => {
     getProjectDetails();
   }, [getProjectDetails, projectId]);
 
+  console.log({ projectDetails });
+
   return (
-    <div className="container mx-auto">
-      {loading && <BarLoader width="100%" />}
-      {/* Spring creation */}
-      {!!Boolean(projectDetails) && (
-        <SprintCreationForm
-          projectTitle={projectDetails?.name}
-          projectId={projectId}
-          projectKey={projectDetails?.key}
-          sprintKey={projectDetails?.sprints?.length + 1}
-          getProjectDetails={getProjectDetails}
-        />
-      )}
-      {/* Spring board */}
-      {projectDetails?.sprints?.length > 0 ? (
-        <SprintBoard
-          sprints={projectDetails?.sprints}
-          projectId={projectId}
-          orgId={projectDetails?.organizationId}
-          getProjectDetails={getProjectDetails}
-        />
-      ) : (
-        <p>Please create sprint by clicking on the above button</p>
-      )}
-    </div>
+    <Suspense fallback={<p>Loading...</p>}>
+      <div className="container mx-auto">
+        {loading && <BarLoader width="100%" />}
+        {/* Spring creation */}
+        {!!Boolean(projectDetails) && (
+          <SprintCreationForm
+            projectTitle={projectDetails?.name}
+            projectId={projectId}
+            projectKey={projectDetails?.key}
+            sprintKey={projectDetails?.sprints?.length + 1}
+            getProjectDetails={getProjectDetails}
+          />
+        )}
+        {/* Spring board */}
+        {projectDetails?.sprints?.length > 0 ? (
+          <SprintBoard
+            sprints={projectDetails?.sprints}
+            projectId={projectId}
+            orgId={projectDetails?.organizationId}
+            getProjectDetails={getProjectDetails}
+          />
+        ) : (
+          <p>Please create sprint by clicking on the above button</p>
+        )}
+      </div>
+    </Suspense>
   );
 };
 
