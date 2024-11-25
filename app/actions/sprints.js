@@ -4,6 +4,7 @@
 
 import { db } from "@/lib/prisma";
 import { auth } from "@clerk/nextjs/server";
+import { addDays } from "date-fns";
 import { revalidatePath } from "next/cache";
 
 export async function createSprint(projectId, data, path) {
@@ -24,9 +25,9 @@ export async function createSprint(projectId, data, path) {
 
   const sprint = await db.sprint.create({
     data: {
-      name: data.name,
-      startDate: data.startDate,
-      endDate: data.endDate,
+      name: data?.name ?? "",
+      startDate: data?.startDate ?? new Date(),
+      endDate: data?.endDate ?? addDays(new Date(),14),
       status: "PLANNED",
       projectId: projectId,
     },
