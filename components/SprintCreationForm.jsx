@@ -96,7 +96,7 @@ const SprintCreationForm = ({
                 />
                 {errors?.name && <p>{errors?.name?.message}</p>}
               </div>
-              <div className="flex-1">
+              {/* <div className="flex-1">
                 <label
                   htmlFor="name"
                   className="block text-sm font-medium mb-1"
@@ -152,7 +152,7 @@ const SprintCreationForm = ({
                     );
                   }}
                 />
-              </div>
+              </div> */}
               <Button type="submit" disabled={createSprintLoading}>
                 {createSprintLoading ? "Creating..." : "Create Sprint"}
               </Button>
