@@ -31,7 +31,7 @@ const Project = () => {
   return (
     <Suspense fallback={<p>Loading...</p>}>
       <div className="container mx-auto">
-        {loading && <BarLoader width="100%" />}
+        {loading && <BarLoader width={"100%"} color="#36d7b7" />}
         {/* Spring creation */}
         {!!Boolean(projectDetails) && (
           <SprintCreationForm
@@ -43,14 +43,15 @@ const Project = () => {
           />
         )}
         {/* Spring board */}
-        {projectDetails?.sprints?.length > 0 ? (
+        {projectDetails?.sprints?.length > 0 && (
           <SprintBoard
             sprints={projectDetails?.sprints}
             projectId={projectId}
             orgId={projectDetails?.organizationId}
             getProjectDetails={getProjectDetails}
           />
-        ) : (
+        )}
+        {!loading && !projectDetails?.sprints?.length && (
           <p>Please create sprint by clicking on the above button</p>
         )}
       </div>
