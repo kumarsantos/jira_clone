@@ -14,7 +14,7 @@ import { toast } from "sonner";
 import { useRouter } from "next/navigation";
 import BoardFilters from "./BoardFilters";
 
-const reOrderList = (list, startIndex, endIndex) => {
+const reOrderList = (list = [], startIndex, endIndex) => {
   const result = Array.from(list);
   const [removed] = result.splice(startIndex, 1);
   result.splice(endIndex, 0, removed);
@@ -143,7 +143,7 @@ const SprintBoard = ({ sprints, projectId, orgId, getProjectDetails }) => {
       {updateIssuesLoading && (
         <BarLoader className="mt-4" width={"100%"} color="#36d7b7" />
       )}
-      <DragDropContext onDragEnd={onDragEnd}>
+      {/* <DragDropContext onDragEnd={onDragEnd}>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 mt-4 gap-4 bg-slate-950 p-4 rounded-lg">
           {boardHeading.map((col) => (
             <Droppable key={col.key} droppableId={col.key}>
@@ -195,7 +195,7 @@ const SprintBoard = ({ sprints, projectId, orgId, getProjectDetails }) => {
             </Droppable>
           ))}
         </div>
-      </DragDropContext>
+      </DragDropContext> */}
     </div>
   );
 };
