@@ -4,7 +4,7 @@ import { getProject } from "@/app/actions/projects";
 import SprintBoard from "@/components/SprintBoard";
 import SprintCreationForm from "@/components/SprintCreationForm";
 import { useParams } from "next/navigation";
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import { BarLoader } from "react-spinners";
 
 const Project = () => {
@@ -13,7 +13,7 @@ const Project = () => {
   const [projectDetails, setProjectDetails] = useState(null);
   const [loading, setLoading] = useState(false);
 
-  const getProjectDetails = async () => {
+  const getProjectDetails = useCallback(async () => {
     setLoading(true);
     try {
       const response = await getProject(projectId);
@@ -23,11 +23,11 @@ const Project = () => {
     } finally {
       setLoading(false);
     }
-  };
+  }, [projectId]);
 
   useEffect(() => {
     getProjectDetails();
-  }, [projectId]);
+  }, [getProjectDetails, projectId]);
 
   return (
     <div className="container mx-auto">
