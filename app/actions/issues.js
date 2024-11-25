@@ -31,12 +31,10 @@ export async function createIssue(projectId, data) {
     throw new Error("Unauthorized");
   }
 
-
-  console.log({projectId,data})
   let user = await db.user.findUnique({ where: { clerkUserId: userId } });
 
   const lastIssue = await db.issue.findFirst({
-    where: { projectId, status: data.status },
+    where: { projectId, status: data?.status },
     orderBy: { order: "desc" },
   });
 
@@ -44,14 +42,14 @@ export async function createIssue(projectId, data) {
 
   const issue = await db.issue.create({
     data: {
-      title: data.title,
-      description: data.description,
-      status: data.status,
-      priority: data.priority,
+      title: data?.title,
+      description: data?.description,
+      status: data?.status,
+      priority: data?.priority,
       projectId: projectId,
-      sprintId: data.sprintId,
-      reporterId: user.id,
-      assigneeId: data.assigneeId || null, // Add this line
+      sprintId: data?.sprintId,
+      reporterId: user?.id,
+      assigneeId: data?.assigneeId || null, // Add this line
       order: newOrder,
     },
     include: {

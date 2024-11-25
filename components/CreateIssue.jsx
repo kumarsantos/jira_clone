@@ -40,6 +40,8 @@ const CreateIssue = () => {
   let status = searchParams.get("status");
   status = status ? status : "TODO";
 
+  console.log({sprintId})
+
   const {
     control,
     register,
