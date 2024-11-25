@@ -1,7 +1,7 @@
 /** @format */
 
 import { format, formatDistanceToNow, isAfter, isBefore } from "date-fns";
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useState } from "react";
 
 import {
   Select,
@@ -17,13 +17,7 @@ import { updateSprintStatus } from "@/app/actions/sprints";
 import { BarLoader } from "react-spinners";
 import { useRouter } from "next/navigation";
 
-const SprintManager = ({
-  sprint,
-  setSprint,
-  sprints,
-  projectId,
-  activeSprint,
-}) => {
+const SprintManager = ({ sprint, setSprint, sprints, activeSprint }) => {
   const [status, setStatus] = useState(sprint?.status);
   const router = useRouter();
   const startDate = new Date(sprint?.startDate);
@@ -37,7 +31,6 @@ const SprintManager = ({
   const {
     fn: updateStatus,
     loading,
-    error,
     data: updatedStatus,
   } = useFetch(updateSprintStatus);
 
@@ -86,8 +79,8 @@ const SprintManager = ({
             {sprints?.map((spr) => {
               return (
                 <SelectItem key={spr?.id} value={spr?.id}>
-                  {sprint?.name} ({format(spr?.startDate, "MMM d, yyyy")}) to
-                  ({format(spr?.endDate, "MMM d, yyyy")})
+                  {sprint?.name} ({format(spr?.startDate, "MMM d, yyyy")}) to (
+                  {format(spr?.endDate, "MMM d, yyyy")})
                 </SelectItem>
               );
             })}

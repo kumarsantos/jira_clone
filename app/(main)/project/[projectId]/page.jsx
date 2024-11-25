@@ -28,8 +28,6 @@ const Project = () => {
     getProjectDetails();
   }, [getProjectDetails, projectId]);
 
-  console.log({ projectDetails });
-
   return (
     <Suspense fallback={<p>Loading...</p>}>
       <div className="container mx-auto">

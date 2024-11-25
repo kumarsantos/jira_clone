@@ -128,14 +128,12 @@ const SprintBoard = ({ sprints, projectId, orgId, getProjectDetails }) => {
         activeSprint={activeSprint}
       />
 
-      {issues?.length && (
-        <BoardFilters
-          issues={issues}
-          onFilterChange={handleFilter}
-          handleAddIssue={handleAddIssue}
-          currentSprint={currentSprint}
-        />
-      )}
+      <BoardFilters
+        issues={issues}
+        onFilterChange={handleFilter}
+        handleAddIssue={handleAddIssue}
+        currentSprint={currentSprint}
+      />
 
       {updateIssuesError && (
         <p className="text-red-500 mt-2">{updateIssuesError?.message}</p>
