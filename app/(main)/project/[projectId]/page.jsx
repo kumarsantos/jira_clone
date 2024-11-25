@@ -12,25 +12,21 @@ const Project = () => {
   const { projectId } = params;
   const [projectDetails, setProjectDetails] = useState(null);
   const [loading, setLoading] = useState(false);
-  const router = useRouter();
   const getProjectDetails = useCallback(async () => {
     setLoading(true);
     try {
       const response = await getProject(projectId);
-      if (!response.ok) {
-        router.push("/organization/" + orgId);
-      }
       setProjectDetails(response);
     } catch (error) {
       console.log(error);
     } finally {
       setLoading(false);
     }
-  }, [projectId, router]);
+  }, [projectId]);
 
   useEffect(() => {
     getProjectDetails();
-  }, [getProjectDetails, projectId, router]);
+  }, [getProjectDetails, projectId]);
 
   return (
     <div className="container mx-auto">
