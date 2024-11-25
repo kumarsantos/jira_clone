@@ -9,7 +9,10 @@
     "lint": "next lint"
   },
   "overrides": {
-    "prisma": "$prisma"
+    "prisma": "$prisma",
+    "react": "$react",
+    "react-dom": "$react-dom",
+    "npm": "$npm"
   },
   "dependencies": {
     "@clerk/clerk-sdk-node": "^5.0.66",
