@@ -116,9 +116,12 @@ const SprintCreationForm = ({
                           >
                             <CalendarRangeIcon className="mr-2 h-4 w-4" />
                             {dateRange?.from && dateRange?.to ? (
-                              format(dateRange.from, "LL dd, y") +
+                              format(dateRange.from ?? new Date(), "LL dd, y") +
                               " - " +
-                              format(dateRange.to, "LL dd, y")
+                              format(
+                                dateRange.to || addDays(new Date(), 14),
+                                "LL dd, y"
+                              )
                             ) : (
                               <span>Pick a date</span>
                             )}
