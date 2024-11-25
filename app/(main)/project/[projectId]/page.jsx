@@ -45,7 +45,7 @@ const Project = () => {
           />
         )}
         {/* Spring board */}
-        {projectDetails?.sprints?.length > 0 ? (
+        {/* {projectDetails?.sprints?.length > 0 ? (
           <SprintBoard
             sprints={projectDetails?.sprints}
             projectId={projectId}
@@ -54,7 +54,7 @@ const Project = () => {
           />
         ) : (
           <p>Please create sprint by clicking on the above button</p>
-        )}
+        )} */}
       </div>
     </Suspense>
   );
